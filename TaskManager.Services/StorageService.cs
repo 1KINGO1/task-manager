@@ -1,21 +1,26 @@
-using TaskManager.Data;
 using TaskManager.Models;
 
 namespace TaskManager.Services;
 
-public class StorageService
+public class StorageService : IStorageService
 {
-    public List<ProjectModel> GetAllProjects()
+    private readonly IProjectRepository _repository;
+
+    public StorageService(IProjectRepository repository)
     {
-        return FakeStorage.Projects
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    }
+
+    public IReadOnlyList<ProjectModel> GetAllProjects()
+    {
+        return _repository.GetAllProjects()
             .Select(ProjectModel.FromData)
             .ToList();
     }
 
-    public List<TaskItemModel> GetTasksByProjectId(int projectId)
+    public IReadOnlyList<TaskItemModel> GetTasksByProjectId(int projectId)
     {
-        return FakeStorage.Tasks
-            .Where(t => t.ProjectId == projectId)
+        return _repository.GetTasksByProjectId(projectId)
             .Select(TaskItemModel.FromData)
             .ToList();
     }

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using TaskManager.Models;
 using TaskManager.Services;
 
@@ -5,10 +6,14 @@ namespace TaskManager.ConsoleApp;
 
 public static class Program
 {
-    private static readonly StorageService _storageService = new();
-
     public static void Main()
     {
+        var services = new ServiceCollection();
+        services.AddTaskManagerServices();
+        using var serviceProvider = services.BuildServiceProvider();
+
+        var storageService = serviceProvider.GetRequiredService<IStorageService>();
+
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.WriteLine("=== Task Manager ===\n");
 
@@ -16,7 +21,7 @@ public static class Program
 
         while (running)
         {
-            List<ProjectModel> projects = LoadProjects();
+            List<ProjectModel> projects = LoadProjects(storageService);
             ShowProjectList(projects);
 
             Console.WriteLine("\nEnter project number to view details, or 'q' to quit:");
@@ -41,22 +46,19 @@ public static class Program
                 continue;
             }
 
-            ShowProjectDetails(selected);
+            ShowProjectDetails(storageService, selected);
         }
 
         Console.WriteLine("\nGoodbye!");
     }
 
-    private static List<ProjectModel> LoadProjects()
+    private static List<ProjectModel> LoadProjects(IStorageService storageService)
     {
-        List<ProjectModel> projects = _storageService.GetAllProjects();
-
-        foreach (ProjectModel project in projects)
+        var projects = storageService.GetAllProjects().ToList();
+        foreach (var project in projects)
         {
-            List<TaskItemModel> tasks = _storageService.GetTasksByProjectId(project.Id);
-            project.Tasks = tasks;
+            project.Tasks = storageService.GetTasksByProjectId(project.Id).ToList();
         }
-
         return projects;
     }
 
@@ -70,7 +72,7 @@ public static class Program
         }
     }
 
-    private static void ShowProjectDetails(ProjectModel project)
+    private static void ShowProjectDetails(IStorageService storageService, ProjectModel project)
     {
         Console.WriteLine();
         Console.WriteLine(project.ToDetailedString());

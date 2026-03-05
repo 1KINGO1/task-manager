@@ -14,6 +14,8 @@ public class TaskItemModel
 
     public bool IsOverdue => !IsCompleted && DueDate < DateTime.Today;
 
+    public string StatusDisplay => IsCompleted ? "Done" : (IsOverdue ? "OVERDUE" : "Pending");
+
     public TaskItemModel(int id, int projectId, string title, string description,
         TaskPriority priority, DateTime dueDate, bool isCompleted)
     {
