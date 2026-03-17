@@ -1,7 +1,6 @@
 <Solution>
-  <Project Path="TaskManager.Data\TaskManager.Data.csproj" />
-  <Project Path="TaskManager.Models\TaskManager.Models.csproj" />
+  <Project Path="TaskManager.Repositories\TaskManager.Repositories.csproj" />
+
   <Project Path="TaskManager.Services\TaskManager.Services.csproj" />
-  <Project Path="TaskManager.ConsoleApp\TaskManager.ConsoleApp.csproj" />
   <Project Path="TaskManager.WpfApp\TaskManager.WpfApp.csproj" />
 </Solution>
