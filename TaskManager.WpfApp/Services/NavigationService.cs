@@ -6,7 +6,8 @@ public class NavigationService : INavigationService
 {
     private readonly Func<Type, ViewModelBase> _viewModelFactory;
     private readonly MainViewModel _mainViewModel;
-    private readonly Stack<ViewModelBase> _navigationStack = new();
+    private readonly Stack<NavigationEntry> _navigationStack = new();
+    private NavigationEntry? _current;
 
     public NavigationService(Func<Type, ViewModelBase> viewModelFactory, MainViewModel mainViewModel)
     {
@@ -18,16 +19,18 @@ public class NavigationService : INavigationService
 
     public void NavigateTo<TViewModel>(object? parameter = null) where TViewModel : class
     {
-        if (_mainViewModel.CurrentViewModel is not null)
-            _navigationStack.Push(_mainViewModel.CurrentViewModel);
+        if (_current is not null)
+            _navigationStack.Push(_current);
 
         var viewModel = _viewModelFactory(typeof(TViewModel));
+        var entry = new NavigationEntry(viewModel, parameter);
+
+        _current = entry;
+        _mainViewModel.CurrentViewModel = viewModel;
+        _mainViewModel.UpdateNavigationState();
 
         if (viewModel is INavigationAware navigationAware)
             navigationAware.OnNavigatedTo(parameter);
-
-        _mainViewModel.CurrentViewModel = viewModel;
-        _mainViewModel.UpdateNavigationState();
     }
 
     public void GoBack()
@@ -35,7 +38,14 @@ public class NavigationService : INavigationService
         if (!CanGoBack)
             return;
 
-        _mainViewModel.CurrentViewModel = _navigationStack.Pop();
+        var previous = _navigationStack.Pop();
+        _current = previous;
+        _mainViewModel.CurrentViewModel = previous.ViewModel;
         _mainViewModel.UpdateNavigationState();
+
+        if (previous.ViewModel is INavigationAware navigationAware)
+            navigationAware.OnNavigatedTo(previous.Parameter);
     }
+
+    private sealed record NavigationEntry(ViewModelBase ViewModel, object? Parameter);
 }

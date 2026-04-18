@@ -5,9 +5,9 @@ namespace TaskManager.Repositories;
 
 public static class RepositoryServiceCollectionExtensions
 {
-    public static IServiceCollection AddRepositories(this IServiceCollection services)
+    public static IServiceCollection AddRepositories(this IServiceCollection services, string storageFilePath)
     {
-        services.AddSingleton<InMemoryStorage>();
+        services.AddSingleton<IDataStore>(_ => new JsonFileDataStore(storageFilePath));
         services.AddSingleton<IProjectRepository, ProjectRepository>();
         services.AddSingleton<ITaskItemRepository, TaskItemRepository>();
         return services;

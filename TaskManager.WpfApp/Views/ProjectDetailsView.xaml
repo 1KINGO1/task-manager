@@ -4,92 +4,240 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </UserControl.Resources>
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Margin="24">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                <TextBlock Text="{Binding ProjectName}" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,8" />
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{Binding ProjectName}" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,6" />
                 <TextBlock Text="{Binding ProjectType}" Foreground="#888" Margin="0,0,0,4" />
-                <TextBlock Text="{Binding ProjectDescription}" TextWrapping="Wrap" Margin="0,0,0,8" />
+                <TextBlock Text="{Binding ProjectDescription}" TextWrapping="Wrap" Margin="0,0,0,6" />
                 <TextBlock Text="{Binding ProgressText}" Foreground="#4EC9B0" FontWeight="SemiBold" />
             </StackPanel>
 
-            <TextBlock Grid.Row="1" Text="Завдання" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12" />
-
-            <ListBox Grid.Row="2"
-                     ItemsSource="{Binding Tasks}"
-                     SelectedItem="{Binding SelectedTask, Mode=TwoWay}"
-                     Visibility="{Binding HasTasks, Converter={StaticResource BoolToVisibility}}"
-                     BorderThickness="1"
-                     BorderBrush="#3F3F46"
-                     Background="#1E1E1E"
-                     Foreground="White"
-                     MaxHeight="300">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Id, Mode=OneWay}" FontWeight="SemiBold" Margin="0,0,8,0" />
-                            <TextBlock Text="{Binding Title, Mode=OneWay}" Margin="0,0,8,0" />
-                            <TextBlock Text="|" Foreground="#666" Margin="0,0,8,0" />
-                            <TextBlock Text="{Binding Priority, Mode=OneWay}" Foreground="#888" Margin="0,0,8,0" />
-                            <TextBlock Text="{Binding DueDate, Mode=OneWay}" Foreground="#888" Margin="0,0,8,0" />
-                            <TextBlock Text="{Binding StatusDisplay, Mode=OneWay}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="#888" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                <Setter Property="Foreground" Value="#4EC9B0" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsOverdue}" Value="True">
-                                                <Setter Property="Foreground" Value="#F48771" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Padding" Value="12,8" />
-                        <Setter Property="Margin" Value="0,0,0,2" />
-                        <Setter Property="Background" Value="#2D2D30" />
-                        <Setter Property="Cursor" Value="Hand" />
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#3E3E42" />
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#0E639C" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
-
-            <TextBlock Grid.Row="3"
-                       Text="Завдань у цьому проєкті немає."
-                       Foreground="#888"
-                       Margin="0,12,0,0">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasTasks}" Value="False">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
+            <StackPanel Grid.Column="1" Orientation="Horizontal"
+                        VerticalAlignment="Top"
+                        Visibility="{Binding ProjectExists, Converter={StaticResource BoolToVisibility}}">
+                <Button Content="Редагувати"
+                        Padding="12,6"
+                        Margin="0,0,6,0"
+                        Background="#6A4FBF"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Command="{Binding EditProjectCommand}" />
+                <Button Content="Видалити"
+                        Padding="12,6"
+                        Background="#9B2C2C"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Command="{Binding DeleteProjectCommand}" />
+            </StackPanel>
         </Grid>
-    </ScrollViewer>
+
+        <Grid Grid.Row="1"
+              Margin="0,12,0,12"
+              Visibility="{Binding ProjectExists, Converter={StaticResource BoolToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0"
+                       Text="Завдання"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center" />
+            <Button Grid.Column="1"
+                    Content="+ Нове завдання"
+                    Padding="12,6"
+                    Background="#0E7C3A"
+                    Foreground="White"
+                    BorderThickness="0"
+                    FontWeight="SemiBold"
+                    Cursor="Hand"
+                    Command="{Binding AddTaskCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="2"
+              Margin="0,0,0,8"
+              Visibility="{Binding ProjectExists, Converter={StaticResource BoolToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0"
+                     Padding="8,6"
+                     VerticalContentAlignment="Center"
+                     Background="#2D2D30"
+                     Foreground="White"
+                     BorderBrush="#3F3F46"
+                     CaretBrush="White"
+                     Text="{Binding TaskSearchText, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Пошук за назвою або пріоритетом" />
+            <TextBlock Grid.Column="1"
+                       Text="Статус:"
+                       Margin="12,0,6,0"
+                       VerticalAlignment="Center"
+                       Foreground="#AAA" />
+            <ComboBox Grid.Column="2"
+                      MinWidth="130"
+                      ItemsSource="{Binding TaskStatusFilters}"
+                      SelectedItem="{Binding SelectedTaskStatusFilter}" />
+            <TextBlock Grid.Column="3"
+                       Text="Сортування:"
+                       Margin="12,0,6,0"
+                       VerticalAlignment="Center"
+                       Foreground="#AAA" />
+            <ComboBox Grid.Column="4"
+                      MinWidth="190"
+                      ItemsSource="{Binding TaskSortOptionsList}"
+                      SelectedItem="{Binding SelectedTaskSortOption}" />
+        </Grid>
+
+        <ListBox Grid.Row="3"
+                 ItemsSource="{Binding Tasks}"
+                 Visibility="{Binding ProjectExists, Converter={StaticResource BoolToVisibility}}"
+                 BorderThickness="1"
+                 BorderBrush="#3F3F46"
+                 Background="#1E1E1E"
+                 Foreground="White"
+                 HorizontalContentAlignment="Stretch"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0"
+                                  IsChecked="{Binding IsCompleted, Mode=OneWay}"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,10,0"
+                                  Command="{Binding DataContext.ToggleTaskCompletedCommand,
+                                                    RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  CommandParameter="{Binding}"
+                                  ToolTip="Позначити як виконане / не виконане" />
+
+                        <StackPanel Grid.Column="1" Orientation="Vertical">
+                            <TextBlock FontWeight="SemiBold">
+                                <Run Text="{Binding Title, Mode=OneWay}" />
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <TextBlock Text="{Binding Priority, Mode=OneWay}" Foreground="#888" Margin="0,0,10,0" />
+                                <TextBlock Text="{Binding DueDate, Mode=OneWay}" Foreground="#888" Margin="0,0,10,0" />
+                                <TextBlock Text="{Binding StatusDisplay, Mode=OneWay}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#888" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                    <Setter Property="Foreground" Value="#4EC9B0" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsOverdue}" Value="True">
+                                                    <Setter Property="Foreground" Value="#F48771" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="Відкрити"
+                                    Padding="10,4"
+                                    Margin="0,0,6,0"
+                                    Background="#0E639C"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Command="{Binding DataContext.OpenTaskCommand,
+                                                     RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" />
+                            <Button Content="Редагувати"
+                                    Padding="10,4"
+                                    Margin="0,0,6,0"
+                                    Background="#6A4FBF"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Command="{Binding DataContext.EditTaskCommand,
+                                                     RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" />
+                            <Button Content="Видалити"
+                                    Padding="10,4"
+                                    Background="#9B2C2C"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Command="{Binding DataContext.DeleteTaskCommand,
+                                                     RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="12,8" />
+                    <Setter Property="Margin" Value="0,0,0,2" />
+                    <Setter Property="Background" Value="#2D2D30" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border Background="{TemplateBinding Background}"
+                                        Padding="{TemplateBinding Padding}"
+                                        CornerRadius="4">
+                                    <ContentPresenter HorizontalAlignment="Stretch" />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#3E3E42" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+
+        <TextBlock Grid.Row="4"
+                   Text="Завдань не знайдено."
+                   Foreground="#888"
+                   Margin="0,12,0,0">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ProjectExists}" Value="True" />
+                                <Condition Binding="{Binding HasTasks}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </Grid>
 </UserControl>

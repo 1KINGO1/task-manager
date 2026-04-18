@@ -4,6 +4,9 @@ namespace TaskManager.Services;
 
 public interface IProjectService
 {
-    IReadOnlyList<ProjectListItemDto> GetAllProjects();
-    ProjectDetailDto? GetProjectDetail(int projectId);
+    Task<IReadOnlyList<ProjectListItemDto>> GetAllProjectsAsync();
+    Task<ProjectDetailDto?> GetProjectDetailAsync(int projectId);
+    Task<ProjectListItemDto> CreateProjectAsync(ProjectFormDto form);
+    Task<bool> UpdateProjectAsync(ProjectFormDto form);
+    Task<bool> DeleteProjectAsync(int projectId);
 }

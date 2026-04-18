@@ -5,20 +5,25 @@ namespace TaskManager.Repositories;
 
 public class ProjectRepository : IProjectRepository
 {
-    private readonly InMemoryStorage _storage;
+    private readonly IDataStore _dataStore;
 
-    public ProjectRepository(InMemoryStorage storage)
+    public ProjectRepository(IDataStore dataStore)
     {
-        _storage = storage;
+        _dataStore = dataStore;
     }
 
-    public IReadOnlyList<ProjectData> GetAllProjects()
-    {
-        return _storage.Projects;
-    }
+    public Task<IReadOnlyList<ProjectData>> GetAllAsync() =>
+        _dataStore.GetProjectsAsync();
 
-    public ProjectData? GetProjectById(int id)
-    {
-        return _storage.Projects.FirstOrDefault(p => p.Id == id);
-    }
+    public Task<ProjectData?> GetByIdAsync(int id) =>
+        _dataStore.GetProjectByIdAsync(id);
+
+    public Task<ProjectData> AddAsync(ProjectData project) =>
+        _dataStore.AddProjectAsync(project);
+
+    public Task<bool> UpdateAsync(ProjectData project) =>
+        _dataStore.UpdateProjectAsync(project);
+
+    public Task<bool> DeleteAsync(int id) =>
+        _dataStore.DeleteProjectAsync(id);
 }

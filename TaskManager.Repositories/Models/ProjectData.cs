@@ -2,10 +2,14 @@ namespace TaskManager.Repositories.Models;
 
 public class ProjectData
 {
-    public int Id { get; }
-    public string Name { get; set; }
-    public string Description { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
     public ProjectType Type { get; set; }
+
+    public ProjectData()
+    {
+    }
 
     public ProjectData(int id, string name, string description, ProjectType type)
     {

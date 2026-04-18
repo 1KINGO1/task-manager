@@ -2,16 +2,20 @@ namespace TaskManager.Repositories.Models;
 
 public class TaskItemData
 {
-    public int Id { get; }
-    public int ProjectId { get; }
-    public string Title { get; set; }
-    public string Description { get; set; }
+    public int Id { get; set; }
+    public int ProjectId { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
     public TaskPriority Priority { get; set; }
     public DateTime DueDate { get; set; }
     public bool IsCompleted { get; set; }
 
+    public TaskItemData()
+    {
+    }
+
     public TaskItemData(int id, int projectId, string title, string description,
-        TaskPriority priority, DateTime dueDate, bool isCompleted)
+        TaskPriority priority, DateTime dueDate, bool isCompleted = false)
     {
         Id = id;
         ProjectId = projectId;
@@ -20,11 +24,5 @@ public class TaskItemData
         Priority = priority;
         DueDate = dueDate;
         IsCompleted = isCompleted;
-    }
-
-    public TaskItemData(int id, int projectId, string title, string description,
-        TaskPriority priority, DateTime dueDate)
-        : this(id, projectId, title, description, priority, dueDate, false)
-    {
     }
 }
